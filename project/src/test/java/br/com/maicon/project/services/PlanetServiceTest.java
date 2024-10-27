@@ -1,32 +1,33 @@
 package br.com.maicon.project.services;
 
+import static br.com.maicon.project.common.PlanetConstants.PLANET;
 import static org.mockito.Mockito.when;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import static br.com.maicon.project.common.PlanetConstants.PLANET;
 import br.com.maicon.project.domain.Planet;
 import br.com.maicon.project.repositories.PlanetRepository;
 
 
-@SpringBootTest(classes = PlanetService.class)
+@ExtendWith(MockitoExtension.class)
 public class PlanetServiceTest {
 
-    @Autowired
+    @InjectMocks
     private PlanetService service;
 
-    @MockBean
+    @Mock
     private PlanetRepository repository;
 
     @Test
     public void createPlanet_withDataValid_returnPlanet() {
         when(repository.save(PLANET)).thenReturn(PLANET);
-        Planet planet = service.create(PLANET);
-        Assertions.assertThat(planet).isEqualTo(PLANET);
+        Planet sut = service.create(PLANET);
+        Assertions.assertThat(sut).isEqualTo(PLANET);
     }
 
 }

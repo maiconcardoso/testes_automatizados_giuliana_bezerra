@@ -1,5 +1,7 @@
 package br.com.maicon.project.web;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,5 +43,13 @@ public class PlanetController {
     public ResponseEntity<Planet> findByName(@PathVariable String name) {
         return service.findByName(name).map((planet) -> ResponseEntity.ok(planet))
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping()
+    public ResponseEntity<List<Planet>> findAll(@RequestParam(required = false) String terrain,
+            @RequestParam(required = false) String climate) {
+        List<Planet> listPlanets = service.findAll(terrain, climate);
+        return ResponseEntity.ok(listPlanets);
+
     }
 }

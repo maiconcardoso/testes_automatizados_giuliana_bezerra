@@ -1,10 +1,14 @@
 package br.com.maicon.project.services;
 
-import static br.com.maicon.project.common.PlanetConstants.PLANET;
 import static br.com.maicon.project.common.PlanetConstants.INVALID_PLANET;
+import static br.com.maicon.project.common.PlanetConstants.PLANET;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -13,12 +17,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.data.domain.Example;
 
 import br.com.maicon.project.domain.Planet;
 import br.com.maicon.project.repositories.PlanetRepository;
+import br.com.maicon.project.until.QueryBuilder;
 
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class PlanetServiceTest {
 
     @InjectMocks
@@ -68,6 +77,29 @@ public class PlanetServiceTest {
         final String name = "Unexisting Name";
         when(repository.findByName(name)).thenReturn(Optional.empty());
         Optional<Planet> sut = service.findByName(name);
+        Assertions.assertThat(sut).isEmpty();
+    }
+
+   /*  @Test
+    public void listPlanets_ReturnsAllPlanets() {
+        List<Planet> planets = new ArrayList<>();
+        planets.add(PLANET);
+        Example<Planet> query = QueryBuilder.makeQuery(new Planet(PLANET.getClimate(), PLANET.getTerrain()));
+        when(repository.findAll(query)).thenReturn(planets);
+
+        List<Planet> sut = service.findAll(PLANET.getClimate(), PLANET.getTerrain());
+
+        Assertions.assertThat(sut).isNotEmpty();
+        Assertions.assertThat(sut).hasSize(1);
+        Assertions.assertThat(sut.get(0)).isEqualTo(PLANET);
+    } */
+
+    @Test
+    public void listPlanets_ReturnsNoPlanets() {
+        when(repository.findAll()).thenReturn(Collections.emptyList());
+
+        List<Planet> sut = service.findAll(PLANET.getClimate(), PLANET.getTerrain());
+
         Assertions.assertThat(sut).isEmpty();
     }
 

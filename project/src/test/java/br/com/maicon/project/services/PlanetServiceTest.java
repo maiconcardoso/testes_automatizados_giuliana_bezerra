@@ -2,11 +2,10 @@ package br.com.maicon.project.services;
 
 import static br.com.maicon.project.common.PlanetConstants.INVALID_PLANET;
 import static br.com.maicon.project.common.PlanetConstants.PLANET;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,11 +18,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.data.domain.Example;
 
 import br.com.maicon.project.domain.Planet;
 import br.com.maicon.project.repositories.PlanetRepository;
-import br.com.maicon.project.until.QueryBuilder;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -101,6 +98,17 @@ public class PlanetServiceTest {
         List<Planet> sut = service.findAll(PLANET.getClimate(), PLANET.getTerrain());
 
         Assertions.assertThat(sut).isEmpty();
+    }
+
+    @Test
+    public void deletePlanet_WithExistingId_doesNotThrowAnyException() {
+        Assertions.assertThatCode(() -> service.deleteById(anyLong())).doesNotThrowAnyException();
+    }
+
+    @Test
+    public void deletePlanet_ByUnexistingId_throwsExceptions() {
+        doThrow(new RuntimeException()).when(repository).deleteById(99l);
+        Assertions.assertThatThrownBy(() -> service.deleteById(99l)).isInstanceOf(RuntimeException.class);
     }
 
 }

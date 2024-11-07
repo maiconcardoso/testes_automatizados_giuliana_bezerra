@@ -1,10 +1,12 @@
 package br.com.maicon.project.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "planets")
@@ -13,8 +15,17 @@ public class Planet {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, unique = true)
+    @NotEmpty
     private String name;
+
+    @Column(nullable = false)
+    @NotEmpty
     private String climate;
+
+    @Column(nullable = false)
+    @NotEmpty
     private String terrain;
 
     public Planet() {

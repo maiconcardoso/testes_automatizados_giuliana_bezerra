@@ -3,7 +3,6 @@ package br.com.maicon.project.web;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.maicon.project.domain.Planet;
 import br.com.maicon.project.services.PlanetService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/planets")
@@ -30,7 +30,7 @@ public class PlanetController {
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
-    public Planet create(@RequestBody Planet planet) {
+    public Planet create(@RequestBody @Valid Planet planet) {
         return service.create(planet);
     }
 

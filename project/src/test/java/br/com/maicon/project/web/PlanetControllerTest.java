@@ -1,12 +1,16 @@
 package br.com.maicon.project.web;
 
 import static br.com.maicon.project.common.PlanetConstants.PLANET;
+import static br.com.maicon.project.common.PlanetConstants.PLANETS;
+import static br.com.maicon.project.common.PlanetConstants.TATOOINE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -80,14 +84,33 @@ public class PlanetControllerTest {
         mockMvc.perform(get("/planets/1")).andExpect(status().isNotFound());
     }
 
-    @Test 
+    @Test
     public void getPlanet_ByExistingName_ReturnsPlanet() throws Exception {
+        when(service.findByName("name")).thenReturn(Optional.of(PLANET));
 
+        mockMvc.perform(get("/planets/name/name")).andExpect(status().isOk());
     }
 
     @Test
     public void getPlanet_ByUnexistingName_ReturnsNotFound() throws Exception {
+        mockMvc.perform(get("/planets/name/name")).andExpect(status().isNotFound());
+    }
 
+    @Test
+    public void listPlanets_ReturnsFilteredPlanets() throws Exception {
+        when(service.findAll("name", "terrain")).thenReturn(PLANETS);
+        when(service.findAll(TATOOINE.getClimate(), TATOOINE.getTerrain())).thenReturn(List.of(TATOOINE));
+
+        mockMvc.perform(get("/planets")).andExpect(status().isOk());
+
+        mockMvc.perform(
+                get("/planets?" + String.format("climate=%sterrain=%s", TATOOINE.getClimate(), TATOOINE.getTerrain())))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void listPlanets_ReturnsNoPlanets() throws Exception {
+        when(service.findAll(null, null)).thenReturn(Collections.emptyList());
     }
 
 }

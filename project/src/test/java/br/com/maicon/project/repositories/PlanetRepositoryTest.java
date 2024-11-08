@@ -1,7 +1,9 @@
 package br.com.maicon.project.repositories;
 
 import static br.com.maicon.project.common.PlanetConstants.PLANET;
+import static br.com.maicon.project.common.PlanetConstants.TATOOINE;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
@@ -10,8 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.data.domain.Example;
 
 import br.com.maicon.project.domain.Planet;
+import br.com.maicon.project.until.QueryBuilder;
 
 @DataJpaTest
 public class PlanetRepositoryTest {
@@ -75,12 +79,42 @@ public class PlanetRepositoryTest {
 
     @Test 
     public void getPlanet_ByExistingName_ReturnsPlanet() {
+        Planet planet = entityManager.persistFlushFind(PLANET);
+        Planet sut = repository.findByName(planet.getName()).get();
 
+        Assertions.assertThat(sut).isEqualTo(planet);
+        Assertions.assertThat(sut.getName()).isEqualTo(planet.getName());
     }
 
     @Test
     public void getPlanet_ByUnexistingName_ReturnsNotFound() {
+        Optional<Planet> sut = repository.findByName("name");
 
+        Assertions.assertThat(sut).isEmpty();
+    }
+
+    @Test
+    public void listPlanets_ReturnsFilteredPlanets() throws Exception {
+        Example<Planet> queryWithoutFilters = QueryBuilder.makeQuery(new Planet());
+        Example<Planet> queryWithFilters = QueryBuilder.makeQuery(new Planet(TATOOINE.getClimate(), TATOOINE.getTerrain()));
+
+        List<Planet> responseWithoutFilters = repository.findAll(queryWithoutFilters);
+        List<Planet> responseWithFilters = repository.findAll(queryWithFilters);
+        
+        Assertions.assertThat(responseWithoutFilters).isEmpty();
+        Assertions.assertThat(responseWithFilters).hasSize(3);
+        Assertions.assertThat(responseWithFilters).isNotEmpty();
+        Assertions.assertThat(responseWithFilters).hasSize(1);
+        Assertions.assertThat(responseWithFilters.get(0)).isEqualTo(TATOOINE);
+    }
+
+    @Test
+    public void listPlanets_ReturnsNoPlanets() throws Exception {
+        Example<Planet> query = QueryBuilder.makeQuery(new Planet());
+
+        List<Planet> response = repository.findAll(query);
+
+        Assertions.assertThat(response).isEmpty();
     }
 
 }

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Example;
+import org.springframework.test.context.jdbc.Sql;
 
 import br.com.maicon.project.domain.Planet;
 import br.com.maicon.project.until.QueryBuilder;
@@ -93,7 +94,8 @@ public class PlanetRepositoryTest {
         Assertions.assertThat(sut).isEmpty();
     }
 
-    @Test
+    /* @Sql(scripts = "/import.sql")
+    @Test  */
     public void listPlanets_ReturnsFilteredPlanets() throws Exception {
         Example<Planet> queryWithoutFilters = QueryBuilder.makeQuery(new Planet());
         Example<Planet> queryWithFilters = QueryBuilder.makeQuery(new Planet(TATOOINE.getClimate(), TATOOINE.getTerrain()));

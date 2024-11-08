@@ -1,6 +1,7 @@
 package br.com.maicon.project.web;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -13,7 +14,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class GeneralExceptionHandler extends ResponseEntityExceptionHandler{
+public class GeneralExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     @Nullable
@@ -25,8 +26,12 @@ public class GeneralExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler(DataIntegrityViolationException.class)
     private ResponseEntity<Object> handleConflict(DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
-            .body(ex.getMessage());
+                .body(ex.getMessage());
     }
 
+    @ExceptionHandler(EmptyResultDataAccessException.class)
+    private ResponseEntity<Object> handleBadRequest(EmptyResultDataAccessException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 
 }

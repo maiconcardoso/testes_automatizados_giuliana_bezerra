@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Example;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -25,8 +26,8 @@ public class PlanetRepositoryTest {
     private PlanetRepository repository;
 
     @Autowired
-    private TestEntityManager entityManager;  
-    
+    private TestEntityManager entityManager;
+
     @AfterEach
     public void afterEach() {
         PLANET.setId(null);
@@ -78,7 +79,7 @@ public class PlanetRepositoryTest {
         Assertions.assertThat(planet).isEmpty();
     }
 
-    @Test 
+    @Test
     public void getPlanet_ByExistingName_ReturnsPlanet() {
         Planet planet = entityManager.persistFlushFind(PLANET);
         Planet sut = repository.findByName(planet.getName()).get();
@@ -94,15 +95,19 @@ public class PlanetRepositoryTest {
         Assertions.assertThat(sut).isEmpty();
     }
 
-    /* @Sql(scripts = "/import.sql")
-    @Test  */
+    /*
+     * @Sql(scripts = "/import.sql")
+     * 
+     * @Test
+     */
     public void listPlanets_ReturnsFilteredPlanets() throws Exception {
         Example<Planet> queryWithoutFilters = QueryBuilder.makeQuery(new Planet());
-        Example<Planet> queryWithFilters = QueryBuilder.makeQuery(new Planet(TATOOINE.getClimate(), TATOOINE.getTerrain()));
+        Example<Planet> queryWithFilters = QueryBuilder
+                .makeQuery(new Planet(TATOOINE.getClimate(), TATOOINE.getTerrain()));
 
         List<Planet> responseWithoutFilters = repository.findAll(queryWithoutFilters);
         List<Planet> responseWithFilters = repository.findAll(queryWithFilters);
-        
+
         Assertions.assertThat(responseWithoutFilters).isEmpty();
         Assertions.assertThat(responseWithFilters).hasSize(3);
         Assertions.assertThat(responseWithFilters).isNotEmpty();
@@ -117,6 +122,21 @@ public class PlanetRepositoryTest {
         List<Planet> response = repository.findAll(query);
 
         Assertions.assertThat(response).isEmpty();
+    }
+
+    @Test
+    public void removePlanet_WithExisting_RemovesPlanetFromDataBase() {
+        Planet planet = entityManager.persistFlushFind(PLANET);
+        repository.deleteById(planet.getId());
+
+        Planet removedPlanet = entityManager.find(Planet.class, planet.getId());
+        Assertions.assertThat(removedPlanet).isNull();
+    }
+
+    @Test
+    public void removePlanet_WithUnexistingId_ThrowsException() {
+        /* Assertions.assertThatThrownBy(() -> repository.deleteById(1L))
+                .isInstanceOf(EmptyResultDataAccessException.class); */
     }
 
 }

@@ -37,6 +37,7 @@ public class PlanetService {
     }
 
     public void deleteById(Long id) {
+        findById(id);
         repository.deleteById(id);
     }
 

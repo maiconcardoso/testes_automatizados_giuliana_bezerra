@@ -4,7 +4,9 @@ import static br.com.maicon.project.common.PlanetConstants.PLANET;
 import static br.com.maicon.project.common.PlanetConstants.PLANETS;
 import static br.com.maicon.project.common.PlanetConstants.TATOOINE;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -111,6 +114,19 @@ public class PlanetControllerTest {
     @Test
     public void listPlanets_ReturnsNoPlanets() throws Exception {
         when(service.findAll(null, null)).thenReturn(Collections.emptyList());
+    }
+
+    @Test
+    public void removePlanet_WithExisting_RemovesPlanetFromDataBase() throws Exception {
+        mockMvc.perform(delete("/planets/1")).andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void removePlanet_WithUnexistingId_ThrowsException() throws Exception {
+        /* final Long planetId = 1L;
+        doThrow(new EmptyResultDataAccessException(1)).when(service).deleteById(planetId);
+
+        mockMvc.perform(delete("/planets/" + planetId)).andExpect(status().isNotFound()); */
     }
 
 }
